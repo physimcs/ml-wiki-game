@@ -2,13 +2,22 @@ from bs4 import BeautifulSoup
 import requests
 
 class Scraper:
-    def __init__(self, current_link):
-        self.parent_link = current_link
+    """
+    Scraper that extracts internal links from a Wikipedia article.
+    """
+    def __init__(self, url):
+        """
+        Initializes scraper.
+
+        Args: 
+        url (str): Full url of article
+        """
+        self.parent_link = url
         self.child_links = {}
 
     def scrape_links(self):
         response = requests.get(self.parent_link)
-        soup = BeautifulSoup(response.text, 'html')
+        soup = BeautifulSoup(response.text, 'lxml')
 
         main_content = soup.find(id='mw-content-text')
         links = main_content.find_all('a', href=True)
@@ -29,7 +38,3 @@ class Scraper:
 
         self.child_links = internal_links
         return self.child_links
-
-stalin = Scraper('https://en.wikipedia.org/wiki/Joseph_Stalin')
-all_links = stalin.get_links()
-print(all_links)
