@@ -27,4 +27,4 @@ class WikiModel:
         best_title = self.article_titles[top_match["corpus_id"]]
         best_link = self.articles[best_title]
 
-        return {best_title: best_link}
+        return [best_title, best_link]
