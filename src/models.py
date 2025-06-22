@@ -1,4 +1,5 @@
 from sentence_transformers import SentenceTransformer, util
+from scraper import Scraper
 
 class WikiModel:
     def __init__(self, current_link, target_link, internal_link_pairs):
@@ -20,11 +21,24 @@ class WikiModel:
         query_embedding = util.normalize_embeddings(query_embedding)
 
         hits = util.semantic_search(
-            query_embedding, corpus_embeddings, top_k=1, score_function=util.dot_score
+            query_embedding, corpus_embeddings, top_k=5, score_function=util.dot_score
         )
-        top_match = hits[0][0]
 
-        best_title = self.article_titles[top_match["corpus_id"]]
-        best_link = self.articles[best_title]
+        top_matches = hits[0]
+        results = []
+        for match in top_matches:
+            article = self.article_titles[match['corpus_id']]
+            results.append(article)
+        return tuple(results)
 
-        return [best_title, best_link]
+
+initial_url = "https://en.wikipedia.org/wiki/Glacial_landform"
+target_title = "Peasant"
+
+scraper = Scraper(initial_url)
+links = scraper.get_links()
+
+model = WikiModel(initial_url, target_title, links)
+best_match = model.best_match()
+
+print(best_match)
